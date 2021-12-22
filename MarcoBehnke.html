@@ -33,6 +33,17 @@
     #changeImage {
       background-color: black;
     }
+    .page-container {
+      background-color: rgb(30, 229, 243);
+      width: 680px;
+      min-height: 400px;
+      padding: 14px;
+      margin: 14px auto;
+    }
+
+    #game-panel .ref {
+      display: block;
+    }
   </style>
   <body>
     <h1>Mein erster Versuch</h1>
@@ -44,6 +55,7 @@
         <li><a href="#h2Video">Mein Video</a></li>
         <li><a href="#berlinerFeuerwehr">Berliner Feuerwehr</a></li>
         <li><a href="#bilder">Bilder</a></li>
+        <li><a href="#wiki">Weitere Infos</a></li>
       </ul>
     </nav>
 
@@ -164,8 +176,26 @@
       </p>
       <p>viel Text</p>
     </section>
-    <section>
-      <!-- später soll hier noch content hin -->
+    <section id="wiki">
+      <div class="page-container">
+        <h1>Spiele Wiki</h1>
+        <section id="game-selector">
+          <span>Spiel: </span>
+          <select>
+            <option value="" disabled selected>Bitte auswählen...</option>
+            <option value="game1.json">Mau Mau</option>
+            <option value="game2.json">Mensch ärgere Dich nicht</option>
+            <option value="game3.json">Dame</option>
+          </select>
+        </section>
+        <section id="game-panel">
+          <h2 class="title">Kein Spiel ausgewählt.</h2>
+          <a class="ref" target="_blank" href="#">
+            <span class="label"></span>
+          </a>
+          <p class="description"></p>
+        </section>
+      </div>
     </section>
     <section>
       <!-- später soll hier noch content hin -->
@@ -231,6 +261,53 @@
 
         counter.innerHTML = length;
       }
+    </script>
+    <script>
+      "use strict"; // ältere JavaScript Systax verbieten
+
+      // select-Element zur Spielauswahl im DOM finden
+      var gameSelector = document.querySelector("#game-selector select");
+
+      // Auf Änderungen des select-Elements reagieren
+      gameSelector.addEventListener("change", function (event) {
+        // Referenz auf select-Elements
+        var select = this;
+        // Ausgewählten Wert auslesen
+        var gameFileName = select.value;
+
+        // Informationen zum Spiel per AJAX laden.
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+          if (this.readyState == 4 && this.status == 200) {
+            // Inhalt der Daten von JSON in JavaScript-Objekt wandeln
+            var gameData = JSON.parse(this.responseText);
+
+            // Anzeige für das Spiel mit geladeden Daten aktualisieren
+            updateGamePanel(gameData);
+          }
+        };
+        xhttp.open("GET", "./" + gameFileName, true);
+        xhttp.send();
+      });
+
+      var updateGamePanel = function (gameData) {
+        // Anzeigebereich für Spielinformationen im DOM finden
+        var gamePanel = document.querySelector("#game-panel");
+
+        // Titel setzen
+        var title = gamePanel.querySelector(".title");
+        title.innerHTML = gameData.title;
+
+        // Quellenangabe setzen
+        var ref = gamePanel.querySelector(".ref");
+        var label = ref.querySelector(".label");
+        ref.href = gameData.ref;
+        label.innerHTML = gameData.ref;
+
+        // Beschreibung setzten
+        var description = gamePanel.querySelector(".description");
+        description.innerHTML = gameData.description;
+      };
     </script>
   </body>
 </html>
